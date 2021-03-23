@@ -2,9 +2,8 @@ package com.onezos.wiki.mapper;
 
 import com.onezos.wiki.domain.Demo;
 import com.onezos.wiki.domain.DemoExample;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface DemoMapper {
     long countByExample(DemoExample example);
