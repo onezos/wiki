@@ -3,8 +3,6 @@
     <a-layout-sider width="200" style="background: #fff">
       <a-menu
               mode="inline"
-              v-model:selectedKeys="selectedKeys2"
-              v-model:openKeys="openKeys"
               :style="{ height: '100%', borderRight: 0 }"
       >
         <a-sub-menu key="sub1">
@@ -98,7 +96,6 @@ export default defineComponent({
 
   name: 'Home',
   setup() {
-    console.log("setup");
     const ebooks = ref();
     const ebooks1 = reactive({books: []})
     const pagination = {
@@ -114,12 +111,10 @@ export default defineComponent({
     ];
 
     onMounted(() => {
-      console.log("onMounted");
       axios.get("/ebook/list").then((response) => {
         const data = response.data;
         ebooks.value = data.content;
         ebooks1.books = data.content;
-        console.log(response);
       });
     });
 
