@@ -3,6 +3,11 @@
     <a-layout-content
             :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <p>
+        <a-button type="primary" @click="add()" size="large">
+          新增
+        </a-button>
+      </p>
       <a-table
               :columns="columns"
               :row-key="record => record.id"
@@ -142,9 +147,8 @@
 
       const handleModelOk = () => {
         modelLoading.value = true;
-
         axios.post("/ebook/save", ebook.value).then((response) => {
-
+          modelLoading.value = false;
           const data = response.data;  // data = commonResp
           if (data.success) {
             modelVisible.value = false;
@@ -159,11 +163,17 @@
         });
       };
 
+      /* ---------------新增--------------- */
+      const add = () => {
+        modelVisible.value = true;
+        ebook.value = {};
+      }
+
       /* ---------------编辑--------------- */
       const edit = (record: any) => {
         modelVisible.value = true;
         ebook.value = record;
-        categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
+        // categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
       }
 
       onMounted(() => {
@@ -179,7 +189,10 @@
         columns,
         loading,
         handleTableChange,
+
         edit,
+        add,
+
         ebook,
         modelVisible,
         modelLoading,
