@@ -16,7 +16,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary" @click="edit">
+            <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
             <a-button type="danger">
@@ -33,7 +33,25 @@
           :confirm-loading="modelLoading"
           @ok="handleModelOk"
   >
-    <p>{{ text }}</p>
+    <a-form :model="ebook" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+      <a-form-item label="封面">
+        <a-input v-model:value="ebook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="ebook.name" />
+      </a-form-item>
+      <a-form-item label="分类">
+        <a-cascader
+                v-model:value="categoryIds"
+                :field-names="{ label: 'name', value: 'id', children: 'children' }"
+                :options="level1"
+        />
+      </a-form-item>
+      <a-form-item label="描述">
+        <a-input v-model:value="ebook.description" type="textarea" />
+      </a-form-item>
+    </a-form>
+    <p>text</p>
   </a-modal>
 </template>
 
@@ -117,20 +135,35 @@
         });
       };
       // ---------------表单---------------
+      const categoryIds = ref();
+      const ebook = ref();
       const modelVisible = ref(false);
       const modelLoading = ref(false);
 
       const handleModelOk = () => {
         modelLoading.value = true;
-        setTimeout(() => {
-          modelVisible.value = false;
-          modelLoading.value = false;
-        }, 2000);
+
+        axios.post("/ebook/save", ebook.value).then((response) => {
+
+          const data = response.data;  // data = commonResp
+          if (data.success) {
+            modelVisible.value = false;
+            modelLoading.value = false;
+
+            // 重新加载列表
+            handleQuery({
+              page: pagination.value.current,
+              size: pagination.value.pageSize,
+            });
+          }
+        });
       };
 
       /* ---------------编辑--------------- */
-      const edit = () => {
+      const edit = (record: any) => {
         modelVisible.value = true;
+        ebook.value = record;
+        categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
       }
 
       onMounted(() => {
@@ -146,11 +179,12 @@
         columns,
         loading,
         handleTableChange,
-
         edit,
+        ebook,
         modelVisible,
         modelLoading,
-        handleModelOk
+        handleModelOk,
+        categoryIds
       }
     }
   });
