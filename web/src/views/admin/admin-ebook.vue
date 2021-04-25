@@ -24,9 +24,17 @@
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
-            <a-button type="danger">
-              删除
-            </a-button>
+            <a-popconfirm
+                    title="删除后不可恢复，确认删除?"
+                    ok-text="是"
+                    cancel-text="否"
+                    @confirm="handleDelete(record.id)"
+                    @cancel="cancel"
+            >
+              <a-button type="danger">
+                删除
+              </a-button>
+            </a-popconfirm>
           </a-space>
         </template>
       </a-table>
@@ -167,14 +175,29 @@
       const add = () => {
         modelVisible.value = true;
         ebook.value = {};
-      }
+      };
+
+      /* ---------------删除--------------- */
+      const handleDelete = (id: number) => {
+        axios.delete("/ebook/delete/" + id).then((response) => {
+          modelLoading.value = false;
+          const data = response.data;  // data = commonResp
+          if (data.success) {
+            // 重新加载列表
+            handleQuery({
+              page: pagination.value.current,
+              size: pagination.value.pageSize,
+            });
+          }
+        });
+      };
 
       /* ---------------编辑--------------- */
       const edit = (record: any) => {
         modelVisible.value = true;
         ebook.value = record;
         // categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
-      }
+      };
 
       onMounted(() => {
         handleQuery({
@@ -197,7 +220,9 @@
         modelVisible,
         modelLoading,
         handleModelOk,
-        categoryIds
+        categoryIds,
+
+        handleDelete
       }
     }
   });
